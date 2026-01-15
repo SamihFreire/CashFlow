@@ -7,6 +7,8 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+builder.Services.AddRouting(option => option.LowercaseUrls = true); // Força todas as urls serem minúsculas
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
