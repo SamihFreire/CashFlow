@@ -1,6 +1,7 @@
 ﻿using CashFlow.Communication.Enums;
 using CashFlow.Communication.Requests;
 using CashFlow.Communication.Responses;
+using CashFlow.Exception.ExceptionsBase;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,20 +21,20 @@ namespace CashFlow.Application.UseCase.Expenses.Register
 
         private void Validate(RequestRegisterExpenseJson request)
         {
-            var titleIsEmpty = string.IsNullOrWhiteSpace(request.Title);
-            if(titleIsEmpty)
-                throw new ArgumentException("The title is required.");
+            // Utilizando a biblioteca do FluentValidation para realizar as validações
+            // Criado a classe RegisterExpenseValidator onde foram registradas as validações que serão realizadas
+            var validator = new RegisterExpenseValidator();
 
-            if(request.Amount <= 0) 
-                throw new ArgumentException("The Amount must be grater tha zero.");
+            // Função da biblioteca que realiza as validações criadas
+            var result = validator.Validate(request);
 
-            var result = DateTime.Compare(request.Date, DateTime.UtcNow);
-            if (result > 0)
-                throw new ArgumentException("Expenses cannot be for the future.");
 
-            var paymentTypeIsValid = Enum.IsDefined(typeof(PaymentType), request.PaymentType);
-            if (!paymentTypeIsValid)
-                throw new ArgumentException("Payment type is not valid.");
+            if(!result.IsValid)
+            {
+                var errorMessage = result.Errors.Select(x => x.ErrorMessage).ToList();
+
+                throw new ErrorOnValidationException(errorMessage);
+            }
         }
     }
 }
