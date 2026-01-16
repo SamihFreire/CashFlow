@@ -28,8 +28,10 @@ namespace CashFlow.Application.UseCase.Expenses.Register
             // Função da biblioteca que realiza as validações criadas
             var result = validator.Validate(request);
 
-
-            if(!result.IsValid)
+            // Caso possua erros de validação
+            // Obtem a lista de erros do FluentValidation e lança a exceção para tratamento
+            // ErrorOnValidationException recebe a lista de erros e todo erro cai na ExceptionFilter para tratamento onde estao os erros mapeados
+            if (!result.IsValid)
             {
                 var errorMessage = result.Errors.Select(x => x.ErrorMessage).ToList();
 
