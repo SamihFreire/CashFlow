@@ -1,4 +1,5 @@
 ﻿using CashFlow.Application.UseCase.Expenses.Register;
+using CashFlow.Exception;
 using CommonTestUtilities.Requests;
 using FluentAssertions;
 
@@ -24,6 +25,24 @@ namespace Validators.Tests.Expenses.Register
             // Assert: Compara o resultado obtido com o resultado esperado
             // Verificando se o result é verdadeiro com o pacote FluentAssertions
             result.IsValid.Should().BeTrue(); // Ela 'DEVERIA' ser true
+        }
+
+        [Fact]
+        public void Error_Title_Empty()
+        {
+            // Arrange
+            var validator = new RegisterExpenseValidator();
+            var request = RequestRegisterExpenseJsonBuilder.Build();
+            request.Title = string.Empty; // Forçando o titulo ser vazio
+
+            // Act
+            var result = validator.Validate(request);
+
+            // Assert
+            result.IsValid.Should().BeFalse(); // A validação deve ser falsa
+
+            // Deve conter apenas um erro e o erro deve ser que o titúlo é obrigatório
+            result.Errors.Should().ContainSingle().And.Contain(e => e.ErrorMessage.Equals(ResourceErrorMessages.TITLE_REQUIRED)); 
         }
     }
 }
