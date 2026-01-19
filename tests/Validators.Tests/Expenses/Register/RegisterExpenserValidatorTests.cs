@@ -1,5 +1,6 @@
 ﻿using CashFlow.Application.UseCase.Expenses.Register;
 using CashFlow.Communication.Requests;
+using CommonTestUtilities.Requests;
 
 namespace Validators.Tests.Expenses.Register
 {
@@ -14,15 +15,8 @@ namespace Validators.Tests.Expenses.Register
             // Precisamos adicionar a referencia de application para ter acesso ao RegisterExpenseValidator
             var validator = new RegisterExpenseValidator();
 
-            // Precisamos adicionar a referencia de communication para ter acesso ao RequestRegisterExpenseJson
-            var request = new RequestRegisterExpenseJson
-            {
-                Amount = 100,
-                Date = DateTime.Now.AddDays(-1),
-                Description = "Description",
-                Title = "Apple",
-                PaymentType = CashFlow.Communication.Enums.PaymentType.CreditCard
-            };
+            // Utilizando a classe de build onde obtemos dados fakes com o pacote Bogus
+            var request = RequestRegisterExpenseJsonBuilder.Build();
 
             // Act: Ação que queremos testa, no caso testar vamos testar se esta válido os dados da requisição
             var result = validator.Validate(request);
