@@ -1,6 +1,6 @@
 ﻿using CashFlow.Application.UseCase.Expenses.Register;
-using CashFlow.Communication.Requests;
 using CommonTestUtilities.Requests;
+using FluentAssertions;
 
 namespace Validators.Tests.Expenses.Register
 {
@@ -22,8 +22,8 @@ namespace Validators.Tests.Expenses.Register
             var result = validator.Validate(request);
 
             // Assert: Compara o resultado obtido com o resultado esperado
-            // Verificando se o result é verdadeiro com a classe Assert
-            Assert.True(result.IsValid);
+            // Verificando se o result é verdadeiro com o pacote FluentAssertions
+            result.IsValid.Should().BeTrue(); // Ela 'DEVERIA' ser true
         }
     }
 }
