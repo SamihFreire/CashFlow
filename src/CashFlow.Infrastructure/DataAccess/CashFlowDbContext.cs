@@ -12,7 +12,7 @@ namespace CashFlow.Infrastructure.DataAccess
             var conncetionString = "Server=localhost;Database=cashflowdb;Uid=root;Pwd=@dm1nT1";
             var serverVersion = new MySqlServerVersion(new Version(8,0,45));
 
-            optionsBuilder.UseMySql(serverVersion);
+            optionsBuilder.UseMySql(conncetionString, serverVersion);
         }
     }
 }
