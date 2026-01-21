@@ -5,14 +5,8 @@ namespace CashFlow.Infrastructure.DataAccess
 {
     internal class CashFlowDbContext : DbContext
     {
+        // : base(options) -> Esta repassando para o contrutor da classe base(o DbContext) as options
+        public CashFlowDbContext(DbContextOptions options) : base(options) { }
         public DbSet<Expense> Expenses { get; set; }
-
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        {
-            var conncetionString = "Server=localhost;Database=cashflowdb;Uid=root;Pwd=@dm1nT1";
-            var serverVersion = new MySqlServerVersion(new Version(8,0,45));
-
-            optionsBuilder.UseMySql(conncetionString, serverVersion);
-        }
     }
 }
