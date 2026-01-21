@@ -1,5 +1,6 @@
 using CashFlow.Api.Filters;
 using CashFlow.Api.Middleware;
+using CashFlow.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -10,7 +11,12 @@ builder.Services.AddSwaggerGen();
 // Configurando para que o Filtro de exception seja utilizado
 builder.Services.AddMvc(options => options.Filters.Add(typeof(ExceptionFilter)));
 
-builder.Services.AddRouting(option => option.LowercaseUrls = true); // For�a todas as urls serem min�sculas
+// Configurando injeção de dependencia
+// Criado um método de extensão onde a classe e o metodo da classe sao static
+// ja deixa explicito que a função recebe como parametro o valor de quem ta chamando que no caso é o builder.Services
+builder.Services.AddInfrastructure();
+
+builder.Services.AddRouting(option => option.LowercaseUrls = true); // Forca todas as urls serem minusculas
 
 var app = builder.Build();
 
