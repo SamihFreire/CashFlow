@@ -1,12 +1,8 @@
-﻿using CashFlow.Communication.Enums;
-using CashFlow.Communication.Requests;
+﻿using CashFlow.Communication.Requests;
 using CashFlow.Communication.Responses;
+using CashFlow.Domain.Entities;
+using CashFlow.Domain.Enums;
 using CashFlow.Exception.ExceptionsBase;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace CashFlow.Application.UseCase.Expenses.Register
 {
@@ -15,6 +11,15 @@ namespace CashFlow.Application.UseCase.Expenses.Register
         public ResponseRegisteredExpenseJson Execute(RequestRegisterExpenseJson request)
         {
             Validate(request);
+
+            var entity = new Expense
+            {
+                Amount = request.Amount,
+                Date = request.Date,
+                Description = request.Description,
+                Title = request.Title,
+                PaymentType = (PaymentType)request.PaymentType,
+            };
 
             return new ResponseRegisteredExpenseJson();
         }
