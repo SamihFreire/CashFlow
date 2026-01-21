@@ -5,7 +5,7 @@ namespace CashFlow.Infrastructure.DataAccess.Repositories
 {
     internal class ExpensesRepository : IExpensesRespository
     {
-        public void add(Expense expense)
+        public void Add(Expense expense)
         {
             var dbContext = new CashFlowDbContext();
 

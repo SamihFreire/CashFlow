@@ -8,6 +8,7 @@ namespace CommonTestUtilities.Requests
     {
         public static RequestRegisterExpenseJson Build()
         {
+            // Utilizando Bogus para geração de dados Fake
             return new Faker<RequestRegisterExpenseJson>()
                 .RuleFor(r => r.Title, faker => faker.Commerce.ProductName())
                 .RuleFor(r => r.Description, faker => faker.Commerce.ProductDescription())

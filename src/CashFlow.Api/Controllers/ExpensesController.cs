@@ -8,10 +8,11 @@ namespace CashFlow.Api.Controllers
     [ApiController]
     public class ExpensesController : ControllerBase
     {
+        // Realizando a injeção de dependencia via [FromServices]
         [HttpPost]
-        public IActionResult Register([FromBody] RequestRegisterExpenseJson request)
+        public IActionResult Register([FromServices] IRegisterExpenseUseCase useCase, [FromBody] RequestRegisterExpenseJson request)
         {
-            var response = new RegisterExpenseUseCase().Execute(request);
+            var response = useCase.Execute(request);
 
             return Created(string.Empty, response);
         }
