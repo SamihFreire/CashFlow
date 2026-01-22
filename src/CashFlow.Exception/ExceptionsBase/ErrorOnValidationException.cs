@@ -3,7 +3,10 @@
     public class ErrorOnValidationException : CashFlowException
     {
         public List<string> Errors { get; set; }
-        public ErrorOnValidationException(List<string> errorMessages)
+
+        // CashFlowException possui um construtor que recebe uma menssagem
+        // Aqui mando pro contrutor uma menssagem vazia
+        public ErrorOnValidationException(List<string> errorMessages) : base(string.Empty)
         {
             Errors = errorMessages;
         }
