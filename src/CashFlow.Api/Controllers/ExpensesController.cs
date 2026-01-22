@@ -10,9 +10,9 @@ namespace CashFlow.Api.Controllers
     {
         // Realizando a injeção de dependencia via [FromServices]
         [HttpPost]
-        public IActionResult Register([FromServices] IRegisterExpenseUseCase useCase, [FromBody] RequestRegisterExpenseJson request)
+        public async Task<IActionResult> Register([FromServices] IRegisterExpenseUseCase useCase, [FromBody] RequestRegisterExpenseJson request)
         {
-            var response = useCase.Execute(request);
+            var response = await useCase.Execute(request);
 
             return Created(string.Empty, response);
         }
