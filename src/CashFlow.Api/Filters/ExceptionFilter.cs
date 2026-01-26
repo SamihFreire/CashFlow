@@ -24,29 +24,35 @@ namespace CashFlow.Api.Filters
 
         private void HandleProjectException(ExceptionContext context)
         {
-            // Local onde sera mapeado os erros tratados
-            if (context.Exception is ErrorOnValidationException errorOnValidationException)
-            {
-                var errorResponse = new ResponseErrorJson(errorOnValidationException.Errors);
+            var cashFlowException = context.Exception as CashFlowException;
+            var errorResponse = new ResponseErrorJson(cashFlowException!.GetErrors()); // ! informa ao compilador que garante nao ser null
 
-                context.HttpContext.Response.StatusCode = StatusCodes.Status400BadRequest;
-                context.Result = new BadRequestObjectResult(errorResponse);
-            }
-            else if(context.Exception is NotFoundExcpetion notFoundExcpetion)
-            {
-                var errorResponse = new ResponseErrorJson(notFoundExcpetion.Message);
-             
-                context.HttpContext.Response.StatusCode = StatusCodes.Status404NotFound;
-                context.Result = new NotFoundObjectResult(errorResponse);
-            }
-            // Caso nao seja referente a nenhum erro tratado cai nesse
-            else
-            {
-                var errorResponse = new ResponseErrorJson(context.Exception.Message);
+            context.HttpContext.Response.StatusCode = cashFlowException.StatusCode;
+            context.Result = new ObjectResult(errorResponse);
 
-                context.HttpContext.Response.StatusCode = StatusCodes.Status400BadRequest;
-                context.Result = new BadRequestObjectResult(errorResponse);
-            }
+            //// Local onde sera mapeado os erros tratados
+            //if (context.Exception is ErrorOnValidationException errorOnValidationException)
+            //{
+            //    var errorResponse = new ResponseErrorJson(errorOnValidationException.Errors);
+
+            //    context.HttpContext.Response.StatusCode = StatusCodes.Status400BadRequest;
+            //    context.Result = new BadRequestObjectResult(errorResponse);
+            //}
+            //else if(context.Exception is NotFoundExcpetion notFoundExcpetion)
+            //{
+            //    var errorResponse = new ResponseErrorJson(notFoundExcpetion.Message);
+
+            //    context.HttpContext.Response.StatusCode = StatusCodes.Status404NotFound;
+            //    context.Result = new NotFoundObjectResult(errorResponse);
+            //}
+            //// Caso nao seja referente a nenhum erro tratado cai nesse
+            //else
+            //{
+            //    var errorResponse = new ResponseErrorJson(context.Exception.Message);
+
+            //    context.HttpContext.Response.StatusCode = StatusCodes.Status400BadRequest;
+            //    context.Result = new BadRequestObjectResult(errorResponse);
+            //}
         }
 
         private void ThrowUnknorError(ExceptionContext context)
