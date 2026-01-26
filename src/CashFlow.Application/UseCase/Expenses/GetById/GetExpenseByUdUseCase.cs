@@ -3,11 +3,6 @@ using CashFlow.Communication.Responses;
 using CashFlow.Domain.Repositories.Expenses;
 using CashFlow.Exception;
 using CashFlow.Exception.ExceptionsBase;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace CashFlow.Application.UseCase.Expenses.GetById
 {
@@ -26,7 +21,7 @@ namespace CashFlow.Application.UseCase.Expenses.GetById
 
             if(result is null)
             {
-                throw new NotFoundExcpetion(ResourceErrorMessages.EXPENSE_NOT_FOUND);
+                throw new NotFoundException(ResourceErrorMessages.EXPENSE_NOT_FOUND);
             }
 
             return _mapper.Map<ResponseExpenseJson>(result);

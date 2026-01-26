@@ -1,4 +1,5 @@
-﻿using CashFlow.Domain.Repositories;
+﻿using CashFlow.Application.UseCase.Expenses.Delete;
+using CashFlow.Domain.Repositories;
 using CashFlow.Domain.Repositories.Expenses;
 using CashFlow.Infrastructure.DataAccess;
 using CashFlow.Infrastructure.DataAccess.Repositories;
@@ -25,6 +26,7 @@ namespace CashFlow.Infrastructure
             services.AddScoped<IUnitOfWork, UnitOfWork>();
             services.AddScoped<IExpensesReadOnlyRepository, ExpensesRepository>();
             services.AddScoped<IExpensesWriteOnlyRepository, ExpensesRepository>();
+            services.AddScoped<IDeleteExpenseUseCase, DeleteExpenseUseCase>();
         }
 
         private static void AddDbContext(IServiceCollection services, IConfiguration configuration)
