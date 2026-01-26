@@ -2,10 +2,8 @@
 
 namespace CashFlow.Domain.Repositories.Expenses
 {
-    public interface IExpensesRespository
+    public interface IExpensesWriteOnlyRepository
     {
         public Task Add(Expense expense);
-        public Task<List<Expense>> GetAll();
-        public Task<Expense?> GetById(long id);
     }
 }

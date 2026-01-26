@@ -13,9 +13,9 @@ namespace CashFlow.Application.UseCase.Expenses.GetById
 {
     public class GetExpenseByUdUseCase : IGetExpenseByUdUseCase
     {
-        private readonly IExpensesRespository _respository;
+        private readonly IExpensesReadOnlyRepository _respository;
         private readonly IMapper _mapper;
-        public GetExpenseByUdUseCase(IExpensesRespository respository, IMapper mapper)
+        public GetExpenseByUdUseCase(IExpensesReadOnlyRepository respository, IMapper mapper)
         {
             _respository = respository;
             _mapper = mapper;
