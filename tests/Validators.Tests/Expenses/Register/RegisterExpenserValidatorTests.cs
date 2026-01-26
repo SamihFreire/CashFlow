@@ -1,4 +1,4 @@
-﻿using CashFlow.Application.UseCase.Expenses.Register;
+﻿using CashFlow.Application.UseCase.Expenses;
 using CashFlow.Communication.Enums;
 using CashFlow.Exception;
 using CommonTestUtilities.Requests;
@@ -15,7 +15,7 @@ namespace Validators.Tests.Expenses.Register
             // Arrange: Criação das instancias de tudo que precisamos para executar os testes
             
             // Precisamos adicionar a referencia de application para ter acesso ao RegisterExpenseValidator
-            var validator = new RegisterExpenseValidator();
+            var validator = new ExpenseValidator();
 
             // Utilizando a classe de build onde obtemos dados fakes com o pacote Bogus
             var request = RequestRegisterExpenseJsonBuilder.Build();
@@ -35,7 +35,7 @@ namespace Validators.Tests.Expenses.Register
         public void Error_Title_Empty(string title)
         {
             // Arrange
-            var validator = new RegisterExpenseValidator();
+            var validator = new ExpenseValidator();
             var request = RequestRegisterExpenseJsonBuilder.Build();
             request.Title = title;
 
@@ -53,7 +53,7 @@ namespace Validators.Tests.Expenses.Register
         public void Error_Date_Future()
         {
             // Arrange
-            var validator = new RegisterExpenseValidator();
+            var validator = new ExpenseValidator();
             var request = RequestRegisterExpenseJsonBuilder.Build();
             request.Date = DateTime.Now.AddDays(1); // Forçando a data ser no futuro
 
@@ -71,7 +71,7 @@ namespace Validators.Tests.Expenses.Register
         public void Error_Payment_Type_Invalid()
         {
             // Arrange
-            var validator = new RegisterExpenseValidator();
+            var validator = new ExpenseValidator();
             var request = RequestRegisterExpenseJsonBuilder.Build();
             request.PaymentType = (PaymentType)700; // Forçando o tipo de pagamento ser invalido
 
@@ -93,7 +93,7 @@ namespace Validators.Tests.Expenses.Register
         public void Error_Amount_Invalid(decimal amount)
         {
             // Arrange
-            var validator = new RegisterExpenseValidator();
+            var validator = new ExpenseValidator();
             var request = RequestRegisterExpenseJsonBuilder.Build();
             request.Amount = amount; // Forçando o valor ser negativo
 

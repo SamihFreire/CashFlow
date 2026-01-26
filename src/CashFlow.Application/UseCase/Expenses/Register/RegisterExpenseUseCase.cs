@@ -21,7 +21,7 @@ namespace CashFlow.Application.UseCase.Expenses.Register
             _unitOfWork = unitOfWork;
             _mapper = mapper;
         }
-        public async Task<ResponseRegisteredExpenseJson> Execute(RequestRegisterExpenseJson request)
+        public async Task<ResponseRegisteredExpenseJson> Execute(RequestExpenseJson request)
         {
             Validate(request);
 
@@ -35,11 +35,11 @@ namespace CashFlow.Application.UseCase.Expenses.Register
             return _mapper.Map<ResponseRegisteredExpenseJson>(entity);
         }
 
-        private void Validate(RequestRegisterExpenseJson request)
+        private void Validate(RequestExpenseJson request)
         {
             // Utilizando a biblioteca do FluentValidation para realizar as validações
             // Criado a classe RegisterExpenseValidator onde foram registradas as validações que serão realizadas
-            var validator = new RegisterExpenseValidator();
+            var validator = new ExpenseValidator();
 
             // Função da biblioteca que realiza as validações criadas
             var result = validator.Validate(request);

@@ -1,0 +1,14 @@
+﻿using CashFlow.Communication.Requests;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace CashFlow.Application.UseCase.Expenses.Update
+{
+    public interface IUpdateExpenseUseCase
+    {
+        public Task Execute(long id, RequestExpenseJson request);
+    }
+}
