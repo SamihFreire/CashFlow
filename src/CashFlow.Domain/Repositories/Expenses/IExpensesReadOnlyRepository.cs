@@ -11,5 +11,6 @@ namespace CashFlow.Domain.Repositories.Expenses
     {
         public Task<List<Expense>> GetAll();
         public Task<Expense?> GetById(long id);
+        public Task<List<Expense>> FilterByMonth(DateOnly date);
     }
 }

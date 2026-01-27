@@ -1,12 +1,23 @@
 ﻿using CashFlow.Domain.Reports;
+using CashFlow.Domain.Repositories.Expenses;
 using ClosedXML.Excel;
+using DocumentFormat.OpenXml.Office.CustomUI;
 
 namespace CashFlow.Application.UseCase.Expenses.Reports.Excel
 {
     public class GenerateExpenseReportExcelUseCase : IGenerateExpenseReportExcelUseCase
     {
+
+        private readonly IExpensesReadOnlyRepository _repository;
+
+        public GenerateExpenseReportExcelUseCase(IExpensesReadOnlyRepository repository)
+        {
+            _repository = repository;
+        }
         public async Task<byte[]> Execute(DateOnly month)
         {
+            var expenses = await _repository.FilterByMonth(month);
+
             // Utilizando o pacote ClosedXML para geração de arquivos XML
             var workbook =  new XLWorkbook();
             workbook.Author = "Samih Freire";
@@ -15,11 +26,15 @@ namespace CashFlow.Application.UseCase.Expenses.Reports.Excel
 
             var worksheet = workbook.Worksheets.Add(month.ToString("Y"));
 
+            InsertHeader(worksheet);
 
-            InserHeader(worksheet);
+            var file = new MemoryStream();
+            workbook.SaveAs(file);
+
+            return file.ToArray();
         }
 
-        private void InserHeader(IXLWorksheet worksheet)
+        private void InsertHeader(IXLWorksheet worksheet)
         {
             worksheet.Cell("A1").Value = ResourceReportGenerationMessages.TITLE;
             worksheet.Cell("B1").Value = ResourceReportGenerationMessages.DATE;
