@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using CashFlow.Communication.Requests;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Net.Mime;
 
@@ -11,7 +12,7 @@ namespace CashFlow.Api.Controllers
         [HttpGet("excel")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
-        public async Task<IActionResult> GetExcel()
+        public async Task<IActionResult> GetExcel([FromHeader] DateOnly month) // Recebendo a data pelo header
         {
             byte[] file = new byte[1];
 
