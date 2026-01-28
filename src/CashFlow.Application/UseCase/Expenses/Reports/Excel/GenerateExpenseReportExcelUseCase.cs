@@ -1,4 +1,5 @@
-﻿using CashFlow.Domain.Reports;
+﻿using CashFlow.Domain.Enums;
+using CashFlow.Domain.Reports;
 using CashFlow.Domain.Repositories.Expenses;
 using ClosedXML.Excel;
 using DocumentFormat.OpenXml.Office.CustomUI;
@@ -17,8 +18,10 @@ namespace CashFlow.Application.UseCase.Expenses.Reports.Excel
         public async Task<byte[]> Execute(DateOnly month)
         {
             var expenses = await _repository.FilterByMonth(month);
+            if (expenses.Count == 0)
+                return [];
 
-            // Utilizando o pacote ClosedXML para geração de arquivos XML
+            // Utilizando o pacote ClosedXML para geração de arquivos Excel
             var workbook =  new XLWorkbook();
             workbook.Author = "Samih Freire";
             workbook.Style.Font.FontSize = 12;
@@ -28,10 +31,34 @@ namespace CashFlow.Application.UseCase.Expenses.Reports.Excel
 
             InsertHeader(worksheet);
 
+            var raw = 2;
+            foreach (var expense in expenses)
+            {
+                worksheet.Cell($"A{raw}").Value = expense.Title;
+                worksheet.Cell($"B{raw}").Value = expense.Date;
+                worksheet.Cell($"C{raw}").Value = ConverPaymentType(expense.PaymentType);
+                worksheet.Cell($"D{raw}").Value = expense.Amount;
+                worksheet.Cell($"E{raw}").Value = expense.Description;
+
+                raw++;
+            }
+
             var file = new MemoryStream();
             workbook.SaveAs(file);
 
             return file.ToArray();
+        }
+
+        private string ConverPaymentType(PaymentType payment)
+        {
+            return payment switch
+            {
+                PaymentType.Cash => "Dinehiro",
+                PaymentType.CreditCard => "Cartão de Crédito",
+                PaymentType.DebitCard => "Cartão de Débito",
+                PaymentType.EletronicTransfer => "Transferencia Bancaria",
+                _ => string.Empty
+            };
         }
 
         private void InsertHeader(IXLWorksheet worksheet)
