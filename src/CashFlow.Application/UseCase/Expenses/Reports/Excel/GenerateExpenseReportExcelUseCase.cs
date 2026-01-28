@@ -8,7 +8,7 @@ namespace CashFlow.Application.UseCase.Expenses.Reports.Excel
 {
     public class GenerateExpenseReportExcelUseCase : IGenerateExpenseReportExcelUseCase
     {
-
+        private const string CURRENCY_SYMBOL = "R$";
         private readonly IExpensesReadOnlyRepository _repository;
 
         public GenerateExpenseReportExcelUseCase(IExpensesReadOnlyRepository repository)
@@ -22,7 +22,7 @@ namespace CashFlow.Application.UseCase.Expenses.Reports.Excel
                 return [];
 
             // Utilizando o pacote ClosedXML para geração de arquivos Excel
-            var workbook =  new XLWorkbook();
+            using var workbook =  new XLWorkbook(); // using garante que ao acabar o processo os recursos sejam liberados
             workbook.Author = "Samih Freire";
             workbook.Style.Font.FontSize = 12;
             workbook.Style.Font.FontName = "Times New Roman";
@@ -37,11 +37,17 @@ namespace CashFlow.Application.UseCase.Expenses.Reports.Excel
                 worksheet.Cell($"A{raw}").Value = expense.Title;
                 worksheet.Cell($"B{raw}").Value = expense.Date;
                 worksheet.Cell($"C{raw}").Value = ConverPaymentType(expense.PaymentType);
+                
                 worksheet.Cell($"D{raw}").Value = expense.Amount;
+                worksheet.Cell($"D{raw}").Style.NumberFormat.Format = $"-{CURRENCY_SYMBOL} #, ##0.00";
+                
+
                 worksheet.Cell($"E{raw}").Value = expense.Description;
 
                 raw++;
             }
+
+            worksheet.Columns().AdjustToContents();
 
             var file = new MemoryStream();
             workbook.SaveAs(file);
