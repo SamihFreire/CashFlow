@@ -1,4 +1,5 @@
 ﻿using CashFlow.Application.UseCase.Expenses.Reports.Excel;
+using CashFlow.Application.UseCase.Expenses.Reports.Pdf;
 using CashFlow.Communication.Requests;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -24,6 +25,25 @@ namespace CashFlow.Api.Controllers
                 // Para devolver uma arquivo
                 // MediaTypeNames.Application.Octet sinaliza ao navegador que ele não precisa interpretar esse arquivo
                 return File(file, MediaTypeNames.Application.Octet, "report.xlsx");
+            }
+
+            return NoContent();
+        }
+
+        [HttpGet("pdf")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        public async Task<IActionResult> GetPdf(
+            [FromServices] IGenerateExpenseReportPdfUseCase useCase,
+            [FromQuery] DateOnly month) // Vai receber a data pela url
+        {
+            byte[] file = await useCase.Execute(month);
+
+            if (file.Length > 0)
+            {
+                // Para devolver uma arquivo
+                // MediaTypeNames.Application.Octet sinaliza ao navegador que ele não precisa interpretar esse arquivo
+                return File(file, MediaTypeNames.Application.Pdf, "report.pdf");
             }
 
             return NoContent();
