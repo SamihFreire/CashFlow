@@ -1,5 +1,7 @@
 ﻿using CashFlow.Application.UseCase.Expenses.Reports.Pdf.Fonts;
+using CashFlow.Domain.Reports;
 using CashFlow.Domain.Repositories.Expenses;
+using MigraDoc.DocumentObjectModel;
 using PdfSharp.Fonts;
 using System;
 using System.Collections.Generic;
@@ -27,9 +29,21 @@ namespace CashFlow.Application.UseCase.Expenses.Reports.Pdf
             if (expenses.Count == 0)
                 return [];
 
+            var document = CreateDocument(month);
+
             return [];
         }
 
+        private Document CreateDocument(DateOnly month)
+        {
+            var document = new Document();
+            document.Info.Title = $"{ResourceReportGenerationMessages.EXPENSES_FOR} {month.ToString("Y")}";
+            document.Info.Author = "Samih Freire";
 
+            var style = document.Styles["Normal"];
+            style!.Font.Name = FontHelper.RALEWAY_REGULAR;
+
+            return document;
+        }
     }
 }
