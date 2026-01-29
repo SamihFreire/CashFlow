@@ -2,6 +2,7 @@
 using CashFlow.Domain.Reports;
 using CashFlow.Domain.Repositories.Expenses;
 using MigraDoc.DocumentObjectModel;
+using MigraDoc.Rendering;
 using PdfSharp.Fonts;
 using System;
 using System.Collections.Generic;
@@ -32,6 +33,19 @@ namespace CashFlow.Application.UseCase.Expenses.Reports.Pdf
             var document = CreateDocument(month);
             var page = CreatePage(document);
 
+            var table = page.AddTable();
+            table.AddColumn();
+            table.AddColumn();
+
+            var row = table.AddRow();
+            row.Cells[0].AddImage("C:\\Users\\GSD\\Pictures\\fotoPerfil.png");
+
+            row.Cells[1].AddParagraph("Hey, Samih Freire");
+            row.Cells[1].Format.Font = new Font { Name = FontHelper.RALEWAY_BLACK, Size = 16 };
+
+
+
+
             var paragraph = page.AddParagraph();
             var title = string.Format(ResourceReportGenerationMessages.TOTAL_SPENT_IN, month.ToString("Y"));
 
@@ -52,7 +66,7 @@ namespace CashFlow.Application.UseCase.Expenses.Reports.Pdf
                 }
             );
 
-            return [];
+            return RenderDocument(document);
         }
 
         private Document CreateDocument(DateOnly month)
@@ -79,6 +93,21 @@ namespace CashFlow.Application.UseCase.Expenses.Reports.Pdf
             section.PageSetup.BottomMargin = 80;
 
             return section;
+        }
+
+        private byte[] RenderDocument(Document document)
+        {
+            var renderer = new PdfDocumentRenderer
+            {
+                Document = document,
+            };
+
+            renderer.RenderDocument();
+
+            using var file = new MemoryStream();
+            renderer.PdfDocument.Save(file);
+
+            return file.ToArray();
         }
     }
 }
