@@ -1,0 +1,16 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace CashFlow.Application.UseCase.Expenses.Reports.Pdf.Fonts
+{
+    public class FontHelper
+    {
+        public const string RALEWAY_REGULAR = "Raleway-Regular";
+        public const string RALEWAY_BLACK = "Raleway-Black";
+        public const string WORKSANS_REGULAR = "WorkSans-Regular";
+        public const string WORKSANS_BLACK = "WorkSans-Black";
+    }
+}
