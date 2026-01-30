@@ -1,14 +1,12 @@
-﻿using CashFlow.Application.UseCase.Expenses.Reports.Pdf.Fonts;
+﻿using CashFlow.Application.UseCase.Expenses.Reports.Pdf.Colors;
+using CashFlow.Application.UseCase.Expenses.Reports.Pdf.Fonts;
 using CashFlow.Domain.Reports;
 using CashFlow.Domain.Repositories.Expenses;
 using MigraDoc.DocumentObjectModel;
+using MigraDoc.DocumentObjectModel.Tables;
 using MigraDoc.Rendering;
 using PdfSharp.Fonts;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Reflection;
 
 namespace CashFlow.Application.UseCase.Expenses.Reports.Pdf
 {
@@ -33,39 +31,17 @@ namespace CashFlow.Application.UseCase.Expenses.Reports.Pdf
             var document = CreateDocument(month);
             var page = CreatePage(document);
 
-            var table = page.AddTable();
-            table.AddColumn();
-            table.AddColumn("300");
+            CreateHeaderWithProfilePhotoAndName(page);
 
-            var row = table.AddRow();
-            row.Cells[0].AddImage("C:\\Users\\GSD\\Pictures\\fotoPerfil.png");
-
-            row.Cells[1].AddParagraph("Hey, Samih Freire");
-            row.Cells[1].Format.Font = new Font { Name = FontHelper.RALEWAY_BLACK, Size = 16 };
-            row.Cells[1].VerticalAlignment = MigraDoc.DocumentObjectModel.Tables.VerticalAlignment.Center;
-
-            var paragraph = page.AddParagraph();
-            paragraph.Format.SpaceBefore = "40";
-            paragraph.Format.SpaceAfter = "40";
-
-            var title = string.Format(ResourceReportGenerationMessages.TOTAL_SPENT_IN, month.ToString("Y"));
-
-            paragraph.AddFormattedText(title, 
-                new Font { 
-                    Name = FontHelper.RALEWAY_REGULAR,
-                    Size = 15
-                });
-
-            paragraph.AddLineBreak();
-            
             var totalExpenses = expenses.Sum(x => x.Amount);
-            paragraph.AddFormattedText($"{CURRENCY_SYMBOL} {totalExpenses}", 
-                new Font
-                {
-                    Name = FontHelper.WORKSANS_BLACK,
-                    Size = 50
-                }
-            );
+            CreateTotalSpentSection(page, month, totalExpenses);
+
+            foreach (var expense in expenses)
+            {
+                var table = CreateExpenseTable(page);
+
+                new Font { Color = ColorsHelper.RED_LIGHT };
+            }
 
             return RenderDocument(document);
         }
@@ -94,6 +70,63 @@ namespace CashFlow.Application.UseCase.Expenses.Reports.Pdf
             section.PageSetup.BottomMargin = 80;
 
             return section;
+        }
+
+        private void CreateHeaderWithProfilePhotoAndName(Section page)
+        {
+            var table = page.AddTable();
+            table.AddColumn();
+            table.AddColumn("300");
+
+            var row = table.AddRow();
+
+            var assembly = Assembly.GetExecutingAssembly();
+            var directoryName = Path.GetDirectoryName(assembly.Location);
+            var pathFile = Path.Combine(directoryName!, "Logo", "fotoPerfil.png");
+
+            row.Cells[0].AddImage(pathFile);
+
+            row.Cells[1].AddParagraph("Hey, Samih Freire");
+            row.Cells[1].Format.Font = new Font { Name = FontHelper.RALEWAY_BLACK, Size = 16 };
+            row.Cells[1].VerticalAlignment = MigraDoc.DocumentObjectModel.Tables.VerticalAlignment.Center;
+        }
+
+        private void CreateTotalSpentSection(Section page, DateOnly month, decimal totalExpenses)
+        {
+            var paragraph = page.AddParagraph();
+            paragraph.Format.SpaceBefore = "40";
+            paragraph.Format.SpaceAfter = "40";
+
+            var title = string.Format(ResourceReportGenerationMessages.TOTAL_SPENT_IN, month.ToString("Y"));
+
+            paragraph.AddFormattedText(title,
+                new Font
+                {
+                    Name = FontHelper.RALEWAY_REGULAR,
+                    Size = 15
+                });
+
+            paragraph.AddLineBreak();
+
+            
+            paragraph.AddFormattedText($"{CURRENCY_SYMBOL} {totalExpenses}",
+                new Font
+                {
+                    Name = FontHelper.WORKSANS_BLACK,
+                    Size = 50
+                }
+            );
+        }
+
+        private Table CreateExpenseTable(Section page)
+        {
+            var table = page.AddTable();
+            table.AddColumn(195).Format.Alignment = ParagraphAlignment.Left;
+            table.AddColumn(80).Format.Alignment = ParagraphAlignment.Center;
+            table.AddColumn(120).Format.Alignment = ParagraphAlignment.Center;
+            table.AddColumn(120).Format.Alignment = ParagraphAlignment.Right;
+
+            return table;
         }
 
         private byte[] RenderDocument(Document document)
