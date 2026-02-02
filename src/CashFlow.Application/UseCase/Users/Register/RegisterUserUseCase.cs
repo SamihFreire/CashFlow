@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using CashFlow.Communication.Requests;
 using CashFlow.Communication.Responses;
+using CashFlow.Domain.Repositories;
 using CashFlow.Domain.Repositories.User;
 using CashFlow.Domain.Security.Cryptography;
 using CashFlow.Exception;
@@ -19,12 +20,21 @@ namespace CashFlow.Application.UseCase.Users.Register
         private readonly IMapper _mapper;
         private readonly IPasswordEncripter _passwordEncripter;
         private readonly IUserReadOnlyRepository _userReadOnlyRepository;
+        private readonly IUserWriteOnlyRepository _userWriteOnlyRepository;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public RegisterUserUseCase(IMapper mapper, IPasswordEncripter passwordEncripter, IUserReadOnlyRepository userReadOnlyRepository)
+        public RegisterUserUseCase(
+            IMapper mapper, 
+            IPasswordEncripter passwordEncripter,
+            IUserReadOnlyRepository userReadOnlyRepository,
+            IUserWriteOnlyRepository userWriteOnlyRepository,
+            IUnitOfWork unitOfWork)
         {
             _mapper = mapper;
             _passwordEncripter = passwordEncripter;
             _userReadOnlyRepository = userReadOnlyRepository;
+            _userWriteOnlyRepository = userWriteOnlyRepository;
+            _unitOfWork = unitOfWork;
         }
 
         public async Task<ResponseRegisteredUserJson> Execute(RequestRegisterUserJson request)
@@ -33,6 +43,11 @@ namespace CashFlow.Application.UseCase.Users.Register
 
             var user = _mapper.Map<Domain.Entities.User>(request); // Configurado no automapper para ignorar o atributo de senha
             user.Password = _passwordEncripter.Encrypt(request.Password);
+            user.UserIdentifier = Guid.NewGuid();
+
+            await _userWriteOnlyRepository.Add(user);
+
+            await _unitOfWork.Commit();
 
             return new ResponseRegisteredUserJson
             {
