@@ -21,7 +21,7 @@ namespace CashFlow.Infrastructure
             AddDbContext(services, configuration);
             AddRespositories(services);
 
-            services.AddScoped<IPasswordEncripter, Security.BCrypt>();
+            services.AddScoped<IPasswordEncripter, Security.Cryptography.BCrypt>();
         }
 
         // Utilizada para configurar a injeção de dependendia dos repositories
