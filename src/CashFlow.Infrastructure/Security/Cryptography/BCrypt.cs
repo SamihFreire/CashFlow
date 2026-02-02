@@ -11,5 +11,11 @@ namespace CashFlow.Infrastructure.Security.Cryptography
 
             return passwordHash;
         }
+
+        // Verifica se a senha que foi recebida bate com o hash do banco de dados
+        public bool Verify(string password, string passwordHash)
+        {
+            return BC.Verify(password, passwordHash);
+        }
     }
 }
