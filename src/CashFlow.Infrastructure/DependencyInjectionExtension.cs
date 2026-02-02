@@ -1,6 +1,7 @@
 ﻿using CashFlow.Application.UseCase.Expenses.Delete;
 using CashFlow.Domain.Repositories;
 using CashFlow.Domain.Repositories.Expenses;
+using CashFlow.Domain.Security.Cryptography;
 using CashFlow.Infrastructure.DataAccess;
 using CashFlow.Infrastructure.DataAccess.Repositories;
 using Microsoft.EntityFrameworkCore;
@@ -18,6 +19,8 @@ namespace CashFlow.Infrastructure
         {
             AddDbContext(services, configuration);
             AddRespositories(services);
+
+            services.AddScoped<IPasswordEncripter, Security.BCrypt>();
         }
 
         // Utilizada para configurar a injeção de dependendia dos repositories
