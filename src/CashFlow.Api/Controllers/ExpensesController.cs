@@ -5,12 +5,14 @@ using CashFlow.Application.UseCase.Expenses.Register;
 using CashFlow.Application.UseCase.Expenses.Update;
 using CashFlow.Communication.Requests;
 using CashFlow.Communication.Responses;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CashFlow.Api.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class ExpensesController : ControllerBase
     {
         // Realizando a injeção de dependencia via [FromServices]
