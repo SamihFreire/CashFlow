@@ -60,7 +60,7 @@ namespace UseCases.Test.Users.Register
             var mapper = MapperBuilder.Build(); // Cria um mapper usando o MapperBuilder, que é uma classe auxiliar para configurar o AutoMapper para os testes
             var unitOfWork = UnitOfWorkBuilder.Build(); // Cria um unit of work usando o UnitOfWorkBuilder, que é uma classe auxiliar para criar uma implementação fake da interface IUnitOfWork usando a biblioteca Moq
             var writeRepository = UserWriteOnlyRepositoryBuilder.Build(); // Cria um repositório de escrita para usuários usando o UserWriteOnlyRepositoryBuilder, que é uma classe auxiliar para criar uma implementação fake da interface IUserWriteOnlyRepository usando a biblioteca Moq
-            var passwordEncripter = PasswordEncripterBuilder.Build(); // Cria um encriptador de senhas usando o PasswordEncripterBuilder, que é uma classe auxiliar para criar uma implementação fake da interface IPasswordEncripter usando a biblioteca Moq
+            var passwordEncripter = new PasswordEncrypterBuilder().Build(); // Cria um encriptador de senhas usando o PasswordEncripterBuilder, que é uma classe auxiliar para criar uma implementação fake da interface IPasswordEncripter usando a biblioteca Moq
             var tokenGenerator = JwtTokenGeneratorBuilder.Build(); // Cria um gerador de tokens JWT usando o JwtTokenGeneratorBuilder, que é uma classe auxiliar para criar uma implementação fake da interface IAccessTokenGenerator usando a biblioteca Moq
             var readRepository = new UserReadOnlyRepositoryBuider(); // Cria um repositório de leitura para usuários usando o UserReadOnlyRepositoryBuider, que é uma classe auxiliar para criar uma implementação fake da interface IUserReadOnlyRepository usando a biblioteca Moq
 

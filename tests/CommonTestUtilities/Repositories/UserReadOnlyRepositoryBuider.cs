@@ -1,4 +1,6 @@
-﻿using CashFlow.Domain.Repositories.User;
+﻿using CashFlow.Domain.Entities;
+using CashFlow.Domain.Repositories.User;
+using DocumentFormat.OpenXml.Office.PowerPoint.Y2021.M06.Main;
 using Moq;
 using System;
 using System.Collections.Generic;
@@ -19,6 +21,13 @@ namespace CommonTestUtilities.Repositories
         public void ExistActiveUserWithEmail(string email) // Criando um método público chamado ExistActiveUserWithEmail que recebe um parâmetro do tipo string representando o email. Esse método é utilizado para configurar o comportamento do mock do repositório de leitura de usuários para simular a existência de um usuário ativo com o email fornecido.
         {
             _repository.Setup(userReadOnly => userReadOnly.ExistActiveUserWithEmail(email)).ReturnsAsync(true);
+        }
+
+        public UserReadOnlyRepositoryBuider GetUsersByEmail(User user)
+        {
+            _repository.Setup(useRepository => useRepository.GetUsersByEmail(user.Email)).ReturnsAsync(user);
+
+            return this;
         }
 
         public IUserReadOnlyRepository Build() => _repository.Object; // Criando um método público chamado Build que retorna uma instância do tipo IUserReadOnlyRepository. O método retorna a implementação fake do repositório de leitura de usuários, que é obtida através da propriedade Object do mock.
