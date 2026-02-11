@@ -41,16 +41,33 @@ namespace UseCases.Test.Users.Register
             result.Where(ex => ex.GetErrors().Count == 1 && ex.GetErrors().Contains(ResourceErrorMessages.NAME_EMPTY)); // Verifica se a exceção lançada contém exatamente um erro e se esse erro é a mensagem de nome vazio (Deve conter a mensagem de erro correta)
         }
 
-        private RegisterUserUseCase CreateUseCase() // Método auxiliar para criar uma instância do RegisterUserUseCase com dependências simuladas
+        [Fact]
+        public async Task Error_Email_Alredy_Exist()
+        {
+            var request = RequestRegisterUserJsonBuilder.Build();
+
+            var useCase = CreateUseCase(request.Email);
+
+            var act = async () => await useCase.Execute(request);
+
+            var result = await act.Should().ThrowAsync<ErrorOnValidationException>();
+
+            result.Where(ex => ex.GetErrors().Count == 1 && ex.GetErrors().Contains(ResourceErrorMessages.EMAIL_ALREADY_REGISTERED));
+        }
+
+        private RegisterUserUseCase CreateUseCase(string? email = null) // Método auxiliar para criar uma instância do RegisterUserUseCase com dependências simuladas
         {
             var mapper = MapperBuilder.Build(); // Cria um mapper usando o MapperBuilder, que é uma classe auxiliar para configurar o AutoMapper para os testes
             var unitOfWork = UnitOfWorkBuilder.Build(); // Cria um unit of work usando o UnitOfWorkBuilder, que é uma classe auxiliar para criar uma implementação fake da interface IUnitOfWork usando a biblioteca Moq
             var writeRepository = UserWriteOnlyRepositoryBuilder.Build(); // Cria um repositório de escrita para usuários usando o UserWriteOnlyRepositoryBuilder, que é uma classe auxiliar para criar uma implementação fake da interface IUserWriteOnlyRepository usando a biblioteca Moq
             var passwordEncripter = PasswordEncripterBuilder.Build(); // Cria um encriptador de senhas usando o PasswordEncripterBuilder, que é uma classe auxiliar para criar uma implementação fake da interface IPasswordEncripter usando a biblioteca Moq
             var tokenGenerator = JwtTokenGeneratorBuilder.Build(); // Cria um gerador de tokens JWT usando o JwtTokenGeneratorBuilder, que é uma classe auxiliar para criar uma implementação fake da interface IAccessTokenGenerator usando a biblioteca Moq
-            var readRepository = new UserReadOnlyRepositoryBuider().Build(); // Cria um repositório de leitura para usuários usando o UserReadOnlyRepositoryBuider, que é uma classe auxiliar para criar uma implementação fake da interface IUserReadOnlyRepository usando a biblioteca Moq
+            var readRepository = new UserReadOnlyRepositoryBuider(); // Cria um repositório de leitura para usuários usando o UserReadOnlyRepositoryBuider, que é uma classe auxiliar para criar uma implementação fake da interface IUserReadOnlyRepository usando a biblioteca Moq
 
-            return new RegisterUserUseCase(mapper, passwordEncripter, readRepository, writeRepository, unitOfWork, tokenGenerator);
+            if (string.IsNullOrWhiteSpace(email) == false) // Verifica se o email fornecido não é nulo ou vazio. Se for fornecido um email, configura o repositório de leitura para simular a existência de um usuário ativo com esse email, o que é necessário para testar o cenário de erro onde o email já está registrado.
+                readRepository.ExistActiveUserWithEmail(email);
+
+            return new RegisterUserUseCase(mapper, passwordEncripter, readRepository.Build(), writeRepository, unitOfWork, tokenGenerator);
         }
     }
 }

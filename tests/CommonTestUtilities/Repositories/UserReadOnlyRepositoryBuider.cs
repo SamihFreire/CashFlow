@@ -16,7 +16,12 @@ namespace CommonTestUtilities.Repositories
         {
             _repository = new Mock<IUserReadOnlyRepository>();
         }
+        public void ExistActiveUserWithEmail(string email) // Criando um método público chamado ExistActiveUserWithEmail que recebe um parâmetro do tipo string representando o email. Esse método é utilizado para configurar o comportamento do mock do repositório de leitura de usuários para simular a existência de um usuário ativo com o email fornecido.
+        {
+            _repository.Setup(userReadOnly => userReadOnly.ExistActiveUserWithEmail(email)).ReturnsAsync(true);
+        }
 
         public IUserReadOnlyRepository Build() => _repository.Object; // Criando um método público chamado Build que retorna uma instância do tipo IUserReadOnlyRepository. O método retorna a implementação fake do repositório de leitura de usuários, que é obtida através da propriedade Object do mock.
+    
     }
 }
