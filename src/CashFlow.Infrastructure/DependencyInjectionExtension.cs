@@ -6,6 +6,7 @@ using CashFlow.Domain.Security.Cryptography;
 using CashFlow.Domain.Security.Tokens;
 using CashFlow.Infrastructure.DataAccess;
 using CashFlow.Infrastructure.DataAccess.Repositories;
+using CashFlow.Infrastructure.Extensions;
 using CashFlow.Infrastructure.Security.Tokens;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -20,11 +21,18 @@ namespace CashFlow.Infrastructure
         // Recebendo o configuration para ter acesso connectionString
         public static void AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
         {
-            AddDbContext(services, configuration);
+            services.AddScoped<IPasswordEncripter, Security.Cryptography.BCrypt>();
+            
             AddToken(services, configuration);
             AddRespositories(services);
 
-            services.AddScoped<IPasswordEncripter, Security.Cryptography.BCrypt>();
+            // Verifica se está em ambiente de teste
+            if (configuration.IsTestEnvironment() == false)
+            {
+                // Não está em ambiente de teste, então configura o DbContext normalmente
+                AddDbContext(services, configuration);
+            }
+
         }
 
         private static void AddToken(IServiceCollection services, IConfiguration configuration)
@@ -49,10 +57,11 @@ namespace CashFlow.Infrastructure
         private static void AddDbContext(IServiceCollection services, IConfiguration configuration)
         {
             var conncetionString = configuration.GetConnectionString("Connection");
-            var serverVersion = new MySqlServerVersion(new Version(8, 0, 45));
+            
+            var serverVersion = ServerVersion.AutoDetect(conncetionString);
 
             //optionsBuilder.UseMySql(conncetionString, serverVersion);
-            
+
             services.AddDbContext<CashFlowDbContext>(config => config.UseMySql(conncetionString, serverVersion));
         }
     }

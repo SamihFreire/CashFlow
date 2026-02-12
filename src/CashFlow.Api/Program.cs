@@ -2,6 +2,7 @@ using CashFlow.Api.Filters;
 using CashFlow.Api.Middleware;
 using CashFlow.Application;
 using CashFlow.Infrastructure;
+using CashFlow.Infrastructure.Extensions;
 using CashFlow.Infrastructure.Migrations;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.Configuration;
@@ -107,7 +108,15 @@ app.UseAuthorization();
 
 app.MapControllers();
 
-await MigrateDatabase(); // Executando de forma automatica as migrations
+// Verificando se está em ambiente de teste
+// Utilizando o método de extensão IsTestEnvironment criado na Infrastructure
+// Ele verifica se a configuração "InMemoryTests" está definida como true
+// Se estiver, significa que estamos em um ambiente de teste com banco de dados em memória
+if(builder.Configuration.IsTestEnvironment() == false)
+{
+    // Executando as migrations apenas se não estiver em ambiente de teste
+    await MigrateDatabase(); // Executando de forma automatica as migrations
+}
 
 app.Run();
 
@@ -117,3 +126,6 @@ async Task MigrateDatabase()
 
     await DataBaseMigration.MigrateDatabase(scope.ServiceProvider);
 }
+
+// Classe parcial para permitir testes de integração
+public partial class  Program { }
