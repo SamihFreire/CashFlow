@@ -1,9 +1,12 @@
-﻿using CommonTestUtilities.Requests;
+﻿using CashFlow.Exception;
+using CommonTestUtilities.Requests;
 using FluentAssertions;
-using Microsoft.AspNetCore.Mvc.Testing;
+using System.Globalization;
 using System.Net;
+using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Text.Json;
+using WebApi.Test.InlineData;
 
 namespace WebApi.Test.Users.Register
 {
@@ -43,6 +46,33 @@ namespace WebApi.Test.Users.Register
             response.RootElement.GetProperty("name").GetString().Should().Be(request.Name);
             response.RootElement.GetProperty("token").GetString().Should().NotBeNullOrEmpty();
 
+        }
+
+        [Theory]
+        [ClassData(typeof(CultureInlineDataTest))] // Utilizando ClassData para fornecer diferentes culturas para o teste, permitindo verificar se as mensagens de erro são retornadas no idioma correto
+        public async Task Error_Empty_Name(string cultureInfo)
+        {
+            var request = RequestRegisterUserJsonBuilder.Build();
+            request.Name = string.Empty;
+
+            // Adicionando o header Accept-Language para a requisição, indicando que a resposta deve ser retornada na linguagem que vem do parametro cultureInfo.
+            // Isso é importante para garantir que as mensagens de erro sejam retornadas no idioma correto, especialmente em casos de validação de dados, onde as mensagens de erro podem variar dependendo do idioma configurado na aplicação.
+            _httpClient.DefaultRequestHeaders.AcceptLanguage.Add(new StringWithQualityHeaderValue(cultureInfo));
+
+            var result = await _httpClient.PostAsJsonAsync(METHOD, request);
+
+            result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+
+            var body = await result.Content.ReadAsStreamAsync();
+
+            var response = await JsonDocument.ParseAsync(body);
+
+            var errors = response.RootElement.GetProperty("errorMessages").EnumerateArray();
+
+            // Obtendo a mensagem de erro esperada para o caso de nome vazio, utilizando o ResourceManager para acessar as mensagens de erro localizadas, e passando o cultureInfo para garantir que a mensagem seja retornada no idioma correto.
+            var expectedMessage = ResourceErrorMessages.ResourceManager.GetString("NAME_EMPTY", new CultureInfo(cultureInfo));
+
+            errors.Should().HaveCount(1).And.Contain(error => error.GetString()!.Equals(expectedMessage));
         }
     }
 }
