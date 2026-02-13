@@ -5,6 +5,7 @@ using CashFlow.Domain.Entities;
 using CashFlow.Domain.Enums;
 using CashFlow.Domain.Repositories;
 using CashFlow.Domain.Repositories.Expenses;
+using CashFlow.Domain.Services.LoggedUser;
 using CashFlow.Exception.ExceptionsBase;
 
 namespace CashFlow.Application.UseCase.Expenses.Register
@@ -14,25 +15,31 @@ namespace CashFlow.Application.UseCase.Expenses.Register
         private readonly IExpensesWriteOnlyRepository _respository;
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
+        private readonly ILoggedUser _loggedUser;
 
-        public RegisterExpenseUseCase(IExpensesWriteOnlyRepository repository, IUnitOfWork unitOfWork, IMapper mapper)
+        public RegisterExpenseUseCase(IExpensesWriteOnlyRepository repository, IUnitOfWork unitOfWork, IMapper mapper, ILoggedUser loggedUser)
         {
             _respository = repository;
             _unitOfWork = unitOfWork;
             _mapper = mapper;
+            _loggedUser = loggedUser;
         }
+
         public async Task<ResponseRegisteredExpenseJson> Execute(RequestExpenseJson request)
         {
             Validate(request);
 
-            // usando o .Map para traduzir a request para a nossa classe de destino
-            var entity = _mapper.Map<Expense>(request);
+            var loggedUser = await _loggedUser.Get();
 
-            await _respository.Add(entity);
+            // usando o .Map para traduzir a request para a nossa classe de destino
+            var expense = _mapper.Map<Expense>(request);
+            expense.UserId = loggedUser.Id;
+
+            await _respository.Add(expense);
             await _unitOfWork.Commit();
 
             // devolvendo a conversao da nossa entidade para a entidade de resposta
-            return _mapper.Map<ResponseRegisteredExpenseJson>(entity);
+            return _mapper.Map<ResponseRegisteredExpenseJson>(expense);
         }
 
         private void Validate(RequestExpenseJson request)
