@@ -1,9 +1,11 @@
 using CashFlow.Api.Filters;
 using CashFlow.Api.Middleware;
+using CashFlow.Api.Token;
 using CashFlow.Application;
 using CashFlow.Infrastructure;
 using CashFlow.Infrastructure.Extensions;
 using CashFlow.Infrastructure.Migrations;
+using CashFlow.Infrastructure.Security.Tokens;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
@@ -65,6 +67,16 @@ builder.Services.AddMvc(options => options.Filters.Add(typeof(ExceptionFilter)))
 // ja deixa explicito que a função recebe como parametro o valor de quem ta chamando que no caso é o builder.Services
 builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.AddApplication();
+
+#region Configurando acesso ao token da requisição HTTP
+
+// Configurando a injeção de dependencia para acessar o token da requisição HTTP
+builder.Services.AddScoped<ITokenProvider, HttpContextTokenValue>();
+
+// Configurando a injeção de dependencia para acessar o contexto HTTP atual, permitindo acessar os dados da requisição HTTP atual
+builder.Services.AddHttpContextAccessor();
+
+#endregion
 
 #region indicando pra API que vai ser usado o authentication
 
