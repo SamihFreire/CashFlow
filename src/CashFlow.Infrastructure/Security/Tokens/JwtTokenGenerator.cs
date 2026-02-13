@@ -27,6 +27,7 @@ namespace CashFlow.Infrastructure.Security.Tokens
             {
                 new Claim(ClaimTypes.Name, user.Name),
                 new Claim(ClaimTypes.Sid, user.UserIdentifier.ToString()),
+                new Claim(ClaimTypes.Role, user.Role), // Adicionando a Role do usuário como uma claim, para que seja possível fazer a autorização baseada em função (Role-based Authorization)
             };
 
             // Descrevendo o meu Token
