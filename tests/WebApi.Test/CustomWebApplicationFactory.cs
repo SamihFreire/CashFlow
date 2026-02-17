@@ -1,4 +1,5 @@
 ﻿using CashFlow.Domain.Entities;
+using CashFlow.Domain.Enums;
 using CashFlow.Domain.Security.Cryptography;
 using CashFlow.Domain.Security.Tokens;
 using CashFlow.Infrastructure.DataAccess;
@@ -14,7 +15,8 @@ namespace WebApi.Test
     // CustomWebApplicationFactory é uma classe personalizada que herda de WebApplicationFactory<Program> (disponibiliza um servidor de teste), onde Program é a classe principal da aplicação web. Essa classe é usada para configurar o ambiente de teste e criar um servidor de teste para a aplicação web.
     public class CustomWebApplicationFactory : WebApplicationFactory<Program>
     {
-        public ExpenseIdentityManager Expense { get; private set; } = default!;
+        public ExpenseIdentityManager Expense_Admin { get; private set; } = default!;
+        public ExpenseIdentityManager Expense_MemberTeam { get; private set; } = default!;
         public UserIdentityManager User_Team_Member { get; private set; } = default!;
         public UserIdentityManager User_Admin { get; private set; } = default!;
 
@@ -61,19 +63,25 @@ namespace WebApi.Test
             IPasswordEncripter passwordEncripter, 
             IAccessTokenGenerator accessTokenGenerator)
         {
-            var user = AddUsersTeamMember(dbContext, passwordEncripter, accessTokenGenerator);
-            AddExpenses(dbContext, user);
+            var userTeamMember = AddUserTeamMember(dbContext, passwordEncripter, accessTokenGenerator);
+            var expenseTeamMember = AddExpenses(dbContext, userTeamMember, expenseId: 1);
+            Expense_MemberTeam = new ExpenseIdentityManager(expenseTeamMember);
+
+            var userAdmin = AddUserAdmin(dbContext, passwordEncripter, accessTokenGenerator);
+            var expenseAdmin = AddExpenses(dbContext, userAdmin, expenseId: 2);
+            Expense_Admin = new ExpenseIdentityManager(expenseAdmin);
 
             dbContext.SaveChanges();
         }
 
-        private User AddUsersTeamMember(
+        private User AddUserTeamMember(
             CashFlowDbContext dbContext, 
             IPasswordEncripter passwordEncripter, 
             IAccessTokenGenerator accessTokenGenerator)
         {
             // Criando um usuário de teste usando o UserBuilder e adicionando-o ao banco de dados em memória
             var user = UserBuilder.Build();// Armazenando a senha original para uso nos testes
+            user.Id = 1;
             var password = user.Password;
 
             user.Password = passwordEncripter.Encrypt(user.Password); // Encriptando a senha do usuário antes de adicioná-lo ao banco de dados
@@ -88,13 +96,34 @@ namespace WebApi.Test
             return user;
         }
 
-        private void AddExpenses(CashFlowDbContext dbContext, User user)
+        private User AddUserAdmin(
+        CashFlowDbContext dbContext,
+        IPasswordEncripter passwordEncripter,
+        IAccessTokenGenerator accessTokenGenerator)
+        {
+            var user = UserBuilder.Build(Roles.ADMIN);
+            user.Id = 2;
+
+            var password = user.Password;
+            user.Password = passwordEncripter.Encrypt(user.Password);
+
+            dbContext.Users.Add(user);
+
+            var token = accessTokenGenerator.Generate(user);
+
+            User_Admin = new UserIdentityManager(user, password, token);
+
+            return user;
+        }
+
+        private Expense AddExpenses(CashFlowDbContext dbContext, User user, long expenseId)
         {
             var expense = ExpenseBuilder.Build(user);
+            expense.Id = expenseId;
 
             dbContext.Expenses.Add(expense);
 
-            Expense = new ExpenseIdentityManager(expense);
+            return expense;
         }
     }
 }

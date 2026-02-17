@@ -28,6 +28,16 @@ namespace CommonTestUtilities.Repositories
             return this;
         }
 
+        public ExpensesReadOnlyRepositoryBuilder FilterByMonth(User user, List<Expense> expenses)
+        {
+            // It.IsAny<DateOnly>() falando para o mock aceitar qualquer valor do tipo DateOnly,
+            // já que o método FilterByMonth tem um parâmetro do tipo DateOnly e não estamos interessados em testar a lógica de filtragem por mês aqui,
+            // mas sim em garantir que o método retorne a lista de despesas correta para o usuário fornecido.
+            _repository.Setup(repository => repository.FilterByMonth(user, It.IsAny<DateOnly>())).ReturnsAsync(expenses);
+
+            return this;
+        }
+
         public IExpensesReadOnlyRepository Build() => _repository.Object;
     }
 }
