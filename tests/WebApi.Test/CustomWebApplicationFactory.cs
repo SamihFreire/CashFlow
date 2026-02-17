@@ -1,4 +1,5 @@
 ﻿using CashFlow.Domain.Security.Cryptography;
+using CashFlow.Domain.Security.Tokens;
 using CashFlow.Infrastructure.DataAccess;
 using CommonTestUtilities.Entities;
 using Microsoft.AspNetCore.Hosting;
@@ -13,6 +14,7 @@ namespace WebApi.Test
     {
         private CashFlow.Domain.Entities.User _user;
         private string _password;
+        private string _token;
 
         // ConfigureWebHost é um método que pode ser sobrescrito para configurar o ambiente de teste.
         // Nesse caso, estamos definindo o ambiente como "Test", o que pode ser usado para carregar configurações específicas para testes, como bancos de dados em memória ou outras dependências de teste.
@@ -44,12 +46,18 @@ namespace WebApi.Test
 
                     // Iniciando o banco de dados com dados de teste
                     StartDataBase(dbContext, passwordEncripter);
+                    
+                    // Obtendo uma instância do IAccessTokenGenerator para gerar tokens de acesso
+                    var tokenGenerator = scope.ServiceProvider.GetRequiredService<IAccessTokenGenerator>();
+
+                    _token = tokenGenerator.Generate(_user); // Gerando um token de acesso para o usuário de teste criado no banco de dados em memória
                 });
         }
 
         public string GetName() => _user.Name;
         public string GetEmail() => _user.Email;
         public string GetPassword() => _password;
+        public string GetToken() => _token;
 
         // Sempre que um teste for executado, o método StartDataBase será chamado para garantir que o banco de dados em memória seja inicializado com os dados necessários para os testes.
         // Isso é especialmente útil para garantir que os testes sejam consistentes e independentes, já que cada teste pode começar com um estado conhecido do banco de dados.

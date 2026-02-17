@@ -14,7 +14,7 @@ namespace UseCases.Test.Expenses.Register
     public class RegisterExpenseUseCaseTest
     {
         [Fact]
-        public async Task Susscess()
+        public async Task Success()
         {
             var loggedUser = UserBuilder.Build();
             var request = RequestRegisterExpenseJsonBuilder.Build();
