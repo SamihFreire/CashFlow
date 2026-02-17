@@ -18,7 +18,7 @@ namespace Validators.Tests.Expenses.Register
             var validator = new ExpenseValidator();
 
             // Utilizando a classe de build onde obtemos dados fakes com o pacote Bogus
-            var request = RequestRegisterExpenseJsonBuilder.Build();
+            var request = RequestExpenseJsonBuilder.Build();
 
             // Act: Ação que queremos testa, no caso testar vamos testar se esta válido os dados da requisição
             var result = validator.Validate(request);
@@ -36,7 +36,7 @@ namespace Validators.Tests.Expenses.Register
         {
             // Arrange
             var validator = new ExpenseValidator();
-            var request = RequestRegisterExpenseJsonBuilder.Build();
+            var request = RequestExpenseJsonBuilder.Build();
             request.Title = title;
 
             // Act
@@ -54,7 +54,7 @@ namespace Validators.Tests.Expenses.Register
         {
             // Arrange
             var validator = new ExpenseValidator();
-            var request = RequestRegisterExpenseJsonBuilder.Build();
+            var request = RequestExpenseJsonBuilder.Build();
             request.Date = DateTime.Now.AddDays(1); // Forçando a data ser no futuro
 
             // Act
@@ -72,7 +72,7 @@ namespace Validators.Tests.Expenses.Register
         {
             // Arrange
             var validator = new ExpenseValidator();
-            var request = RequestRegisterExpenseJsonBuilder.Build();
+            var request = RequestExpenseJsonBuilder.Build();
             request.PaymentType = (PaymentType)700; // Forçando o tipo de pagamento ser invalido
 
             // Act
@@ -94,7 +94,7 @@ namespace Validators.Tests.Expenses.Register
         {
             // Arrange
             var validator = new ExpenseValidator();
-            var request = RequestRegisterExpenseJsonBuilder.Build();
+            var request = RequestExpenseJsonBuilder.Build();
             request.Amount = amount; // Forçando o valor ser negativo
 
             // Act
