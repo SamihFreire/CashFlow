@@ -13,7 +13,9 @@ namespace WebApi.Test
     // CustomWebApplicationFactory é uma classe personalizada que herda de WebApplicationFactory<Program> (disponibiliza um servidor de teste), onde Program é a classe principal da aplicação web. Essa classe é usada para configurar o ambiente de teste e criar um servidor de teste para a aplicação web.
     public class CustomWebApplicationFactory : WebApplicationFactory<Program>
     {
-        private CashFlow.Domain.Entities.User _user;
+        private Expense _expense;
+
+        private User _user;
         private string _password;
         private string _token;
 
@@ -59,8 +61,7 @@ namespace WebApi.Test
         public string GetEmail() => _user.Email;
         public string GetPassword() => _password;
         public string GetToken() => _token;
-
-        
+        public long GetExpenseId() => _expense.Id;
 
         // Sempre que um teste for executado, o método StartDataBase será chamado para garantir que o banco de dados em memória seja inicializado com os dados necessários para os testes.
         // Isso é especialmente útil para garantir que os testes sejam consistentes e independentes, já que cada teste pode começar com um estado conhecido do banco de dados.
@@ -85,9 +86,9 @@ namespace WebApi.Test
 
         private void AddExpenses(CashFlowDbContext dbContext, User user)
         {
-            var expense = ExpenseBuilder.Build(user);
+            _expense = ExpenseBuilder.Build(user);
 
-            dbContext.Expenses.Add(expense);
+            dbContext.Expenses.Add(_expense);
         }
     }
 }

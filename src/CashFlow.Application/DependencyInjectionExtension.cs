@@ -31,7 +31,7 @@ namespace CashFlow.Application
         {
             services.AddScoped<IRegisterExpenseUseCase, RegisterExpenseUseCase>();
             services.AddScoped<IGetAllExpenseUseCase, GetAllExpenseUseCase>();
-            services.AddScoped<IGetExpenseByUdUseCase, GetExpenseByUdUseCase>();
+            services.AddScoped<IGetExpenseByIdUseCase, GetExpenseByIdUseCase>();
             services.AddScoped<IDeleteExpenseUseCase, DeleteExpenseUseCase>();
             services.AddScoped<IUpdateExpenseUseCase, UpdateExpenseUseCase>();
             services.AddScoped<IGenerateExpenseReportExcelUseCase, GenerateExpenseReportExcelUseCase>();

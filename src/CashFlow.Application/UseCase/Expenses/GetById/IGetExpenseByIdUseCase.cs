@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace CashFlow.Application.UseCase.Expenses.GetById
 {
-    public interface IGetExpenseByUdUseCase
+    public interface IGetExpenseByIdUseCase
     {
         public Task<ResponseExpenseJson> Execute(long id);
     }
