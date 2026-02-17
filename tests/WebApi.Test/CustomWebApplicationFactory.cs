@@ -1,4 +1,5 @@
-﻿using CashFlow.Domain.Security.Cryptography;
+﻿using CashFlow.Domain.Entities;
+using CashFlow.Domain.Security.Cryptography;
 using CashFlow.Domain.Security.Tokens;
 using CashFlow.Infrastructure.DataAccess;
 using CommonTestUtilities.Entities;
@@ -45,7 +46,7 @@ namespace WebApi.Test
                     var passwordEncripter = scope.ServiceProvider.GetRequiredService<IPasswordEncripter>();
 
                     // Iniciando o banco de dados com dados de teste
-                    StartDataBase(dbContext, passwordEncripter);
+                    StartDatabase(dbContext, passwordEncripter);
                     
                     // Obtendo uma instância do IAccessTokenGenerator para gerar tokens de acesso
                     var tokenGenerator = scope.ServiceProvider.GetRequiredService<IAccessTokenGenerator>();
@@ -59,18 +60,34 @@ namespace WebApi.Test
         public string GetPassword() => _password;
         public string GetToken() => _token;
 
+        
+
         // Sempre que um teste for executado, o método StartDataBase será chamado para garantir que o banco de dados em memória seja inicializado com os dados necessários para os testes.
         // Isso é especialmente útil para garantir que os testes sejam consistentes e independentes, já que cada teste pode começar com um estado conhecido do banco de dados.
-        private void StartDataBase(CashFlowDbContext dbContext, IPasswordEncripter passwordEncripter)
+        private void StartDatabase(CashFlowDbContext dbContext, IPasswordEncripter passwordEncripter)
+        {
+            AddUsers(dbContext, passwordEncripter);
+            AddExpenses(dbContext, _user);
+
+            dbContext.SaveChanges();
+        }
+
+        private void AddUsers(CashFlowDbContext dbContext, IPasswordEncripter passwordEncripter)
         {
             // Criando um usuário de teste usando o UserBuilder e adicionando-o ao banco de dados em memória
-            _user = UserBuilder.Build();
-            _password = _user.Password; // Armazenando a senha original para uso nos testes
+            _user = UserBuilder.Build();// Armazenando a senha original para uso nos testes
+            _password = _user.Password;
+
             _user.Password = passwordEncripter.Encrypt(_user.Password); // Encriptando a senha do usuário antes de adicioná-lo ao banco de dados
 
             dbContext.Users.Add(_user);
+        }
 
-            dbContext.SaveChanges();
+        private void AddExpenses(CashFlowDbContext dbContext, User user)
+        {
+            var expense = ExpenseBuilder.Build(user);
+
+            dbContext.Expenses.Add(expense);
         }
     }
 }
