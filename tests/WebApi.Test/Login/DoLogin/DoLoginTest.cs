@@ -2,32 +2,22 @@
 using CashFlow.Exception;
 using CommonTestUtilities.Requests;
 using FluentAssertions;
-using System;
-using System.Collections.Generic;
 using System.Globalization;
-using System.Linq;
 using System.Net;
-using System.Net.Http.Headers;
-using System.Net.Http.Json;
-using System.Runtime.InteropServices;
-using System.Text;
 using System.Text.Json;
-using System.Threading.Tasks;
 using WebApi.Test.InlineData;
 
 namespace WebApi.Test.Login.DoLogin
 {
-    public class DoLoginTest : IClassFixture<CustomWebApplicationFactory>
+    public class DoLoginTest : CashFlowClassFixture
     {
         private readonly string METHOD = "api/login";
-        private readonly HttpClient _httpClient;
         private readonly string _email;
         private readonly string _name;
         private readonly string _password;
 
-        public DoLoginTest(CustomWebApplicationFactory webApplicationFactory)
+        public DoLoginTest(CustomWebApplicationFactory webApplicationFactory) : base(webApplicationFactory)
         {
-            _httpClient = webApplicationFactory.CreateClient();
             _email = webApplicationFactory.GetEmail();
             _name = webApplicationFactory.GetName();
             _password = webApplicationFactory.GetPassword();
@@ -42,7 +32,7 @@ namespace WebApi.Test.Login.DoLogin
                 Password = _password,
             };
 
-            var response = await _httpClient.PostAsJsonAsync(METHOD, request);
+            var response = await DoPost(requestUri: METHOD, request: request);
 
             response.StatusCode.Should().Be(HttpStatusCode.OK);
 
@@ -60,8 +50,7 @@ namespace WebApi.Test.Login.DoLogin
         {
             var request = RequestLoginJsonBuilder.Build();
 
-            _httpClient.DefaultRequestHeaders.AcceptLanguage.Add(new StringWithQualityHeaderValue(culture));
-            var response = await _httpClient.PostAsJsonAsync(METHOD, request);
+            var response = await DoPost(requestUri: METHOD, request: request, culture: culture);
 
             response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
 

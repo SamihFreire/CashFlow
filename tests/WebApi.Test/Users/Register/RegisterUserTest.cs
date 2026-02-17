@@ -3,25 +3,19 @@ using CommonTestUtilities.Requests;
 using FluentAssertions;
 using System.Globalization;
 using System.Net;
-using System.Net.Http.Headers;
-using System.Net.Http.Json;
 using System.Text.Json;
 using WebApi.Test.InlineData;
 
 namespace WebApi.Test.Users.Register
 {
     // Teste de integração para o endpoint de registro de usuário
-    // IClassFixture é utilizado para compartilhar a instância do WebApplicationFactory entre os testes
-    // WebApplicationFactory cria um servidor de teste para a aplicação web
-    // Program é a classe parcial criada no projeto principal para permitir testes de integração
-    public class RegisterUserTest : IClassFixture<CustomWebApplicationFactory>
+    public class RegisterUserTest : CashFlowClassFixture
     {
-        private readonly HttpClient _httpClient; // HttpClient é utilizado para enviar requisições HTTP para o servidor de teste
         private readonly string METHOD = "api/user";
 
-        public RegisterUserTest(CustomWebApplicationFactory webApplicationFactory)
+        public RegisterUserTest(CustomWebApplicationFactory webApplicationFactory) : base(webApplicationFactory)
         {
-            _httpClient = webApplicationFactory.CreateClient(); // Criando uma instância do HttpClient a partir do WebApplicationFactory, que será usada para enviar requisições para o servidor de teste
+
         }
 
         [Fact]
@@ -31,7 +25,8 @@ namespace WebApi.Test.Users.Register
             var request = RequestRegisterUserJsonBuilder.Build();
 
             // Enviando uma requisição POST para o endpoint de registro de usuário, passando o objeto request como JSON no corpo da requisição
-            var result = await _httpClient.PostAsJsonAsync(METHOD, request);
+            // O método DoPost é uma função auxiliar que encapsula a lógica de envio da requisição e leitura da resposta, facilitando a escrita dos testes e garantindo que a estrutura do teste seja mais clara e concisa.
+            var result = await DoPost(METHOD, request);
 
             // Verificando se o status code da resposta é Created (201), indicando que o usuário foi registrado com sucesso
             result.StatusCode.Should().Be(HttpStatusCode.Created);
@@ -50,17 +45,19 @@ namespace WebApi.Test.Users.Register
 
         [Theory]
         [ClassData(typeof(CultureInlineDataTest))] // Utilizando ClassData para fornecer diferentes culturas para o teste, permitindo verificar se as mensagens de erro são retornadas no idioma correto
-        public async Task Error_Empty_Name(string cultureInfo)
+        public async Task Error_Empty_Name(string culture)
         {
             var request = RequestRegisterUserJsonBuilder.Build();
             request.Name = string.Empty;
 
             // Adicionando o header Accept-Language para a requisição, indicando que a resposta deve ser retornada na linguagem que vem do parametro cultureInfo.
             // Isso é importante para garantir que as mensagens de erro sejam retornadas no idioma correto, especialmente em casos de validação de dados, onde as mensagens de erro podem variar dependendo do idioma configurado na aplicação.
-            _httpClient.DefaultRequestHeaders.AcceptLanguage.Add(new StringWithQualityHeaderValue(cultureInfo));
+            //_httpClient.DefaultRequestHeaders.AcceptLanguage.Add(new StringWithQualityHeaderValue(culture));
 
-            var result = await _httpClient.PostAsJsonAsync(METHOD, request);
+            // Enviando a requisição POST para o endpoint de registro de usuário com o nome vazio
+            var result = await DoPost(requestUri: METHOD, request: request, culture: culture);
 
+            // Verificando se o status code da resposta é BadRequest (400), indicando que houve um erro na validação dos dados enviados na requisição.
             result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
 
             var body = await result.Content.ReadAsStreamAsync();
@@ -70,7 +67,7 @@ namespace WebApi.Test.Users.Register
             var errors = response.RootElement.GetProperty("errorMessages").EnumerateArray();
 
             // Obtendo a mensagem de erro esperada para o caso de nome vazio, utilizando o ResourceManager para acessar as mensagens de erro localizadas, e passando o cultureInfo para garantir que a mensagem seja retornada no idioma correto.
-            var expectedMessage = ResourceErrorMessages.ResourceManager.GetString("NAME_EMPTY", new CultureInfo(cultureInfo));
+            var expectedMessage = ResourceErrorMessages.ResourceManager.GetString("NAME_EMPTY", new CultureInfo(culture));
 
             errors.Should().HaveCount(1).And.Contain(error => error.GetString()!.Equals(expectedMessage));
         }
