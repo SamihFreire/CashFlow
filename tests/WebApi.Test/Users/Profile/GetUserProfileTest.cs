@@ -6,7 +6,7 @@ namespace WebApi.Test.Users.Profile
 {
     public class GetUserProfileTest : CashFlowClassFixture
     {
-        private const string METHOD = "api/User";
+        private const string METHOD = "api/user";
 
         private readonly string _token;
         private readonly string _userName;
