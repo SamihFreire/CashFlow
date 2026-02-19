@@ -16,9 +16,15 @@ namespace CashFlow.Application.AutoMapper
 
         private void RequestToEntity()
         {
-            CreateMap<RequestExpenseJson, Expense>();
             CreateMap<RequestRegisterUserJson, User>()
                 .ForMember(user => user.Password, config => config.Ignore()); // Mapea todas as propriedades e ignora o password
+
+            CreateMap<RequestExpenseJson, Expense>()
+                .ForMember(dest => dest.Tags, config => config.MapFrom(source => source.Tags.Distinct())); // Mapeia a lista de tags da camada de comunicação para a lista de tags da camada de domínio, garantindo que sejam distintas
+
+            // Mapeia o enum Tag da camada de comunicação para o enum Tag da camada de domínio
+            CreateMap<Communication.Enums.Tag, Tag>()
+            .ForMember(dest => dest.Value, config => config.MapFrom(source => source));
         }
 
         private void EntityToResponse()
