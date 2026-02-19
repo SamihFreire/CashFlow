@@ -38,6 +38,8 @@ namespace CashFlow.Application.UseCase.Expenses.Update
                 throw new NotFoundException(ResourceErrorMessages.EXPENSE_NOT_FOUND);
             }
 
+            expense.Tags.Clear();
+
             _mapper.Map(request, expense); // Ele vai pegar os dados que estao em request e levar para o objeto ja criado expense
             //_mapper.Map<Expense>(request); //Ele vai instanciar um novo objeto do tipo Expense levando todos os dados que estão em request
 
