@@ -29,9 +29,12 @@ namespace CashFlow.Application.AutoMapper
 
         private void EntityToResponse()
         {
+            // Mapeia a lista de tags da camada de domínio para a lista de tags da camada de comunicação, extraindo apenas o valor de cada tag
+            CreateMap<Expense, ResponseExpenseJson>()
+                .ForMember(dest => dest.Tags, config => config.MapFrom(source => source.Tags.Select(tag => tag.Value)));
+
             CreateMap<Expense,ResponseRegisteredExpenseJson>();
             CreateMap<Expense,ResponseShortExpenseJson>();
-            CreateMap<Expense, ResponseExpenseJson>();
             CreateMap<User, ResponseUserProfileJson>();
         }
     }
