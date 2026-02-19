@@ -7,11 +7,6 @@ using CommonTestUtilities.LoggedUser;
 using CommonTestUtilities.Mapper;
 using CommonTestUtilities.Repositories;
 using FluentAssertions;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace UseCases.Test.Expenses.GetById
 {
@@ -34,6 +29,7 @@ namespace UseCases.Test.Expenses.GetById
             result.Date.Should().Be(expense.Date);
             result.Amount.Should().Be(expense.Amount);
             result.PaymentType.Should().Be((CashFlow.Communication.Enums.PaymentType)expense.PaymentType);
+            result.Tags.Should().NotBeNullOrEmpty().And.BeEquivalentTo(expense.Tags.Select(tag => tag.Value));
         }
 
         [Fact]
