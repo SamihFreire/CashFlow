@@ -3,11 +3,14 @@ using CashFlow.Api.Middleware;
 using CashFlow.Api.Token;
 using CashFlow.Application;
 using CashFlow.Infrastructure;
+using CashFlow.Infrastructure.DataAccess;
 using CashFlow.Infrastructure.Extensions;
 using CashFlow.Infrastructure.Migrations;
 using CashFlow.Infrastructure.Security.Tokens;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text;
@@ -101,7 +104,24 @@ builder.Services.AddAuthentication(config =>
 
 builder.Services.AddRouting(option => option.LowercaseUrls = true); // Forca todas as urls serem minusculas
 
+builder.Services.AddHealthChecks().AddDbContextCheck<CashFlowDbContext>(); // Adiciona uma verificação de saúde para o banco de dados, garantindo que a aplicação possa se conectar ao banco de dados corretamente
+
 var app = builder.Build();
+
+// MapHealthChecks é um método que mapeia um endpoint para as verificações de saúde da aplicação.
+// Nesse caso, o endpoint é "/Health".
+// O HealthCheckOptions permite configurar as opções para as verificações de saúde,
+// como desabilitar o cache para garantir que as verificações sejam sempre atualizadas e definir os códigos de status HTTP a serem retornados com base
+// no resultado da verificação de saúde (200 OK para saudável e 503 Service Unavailable para não saudável).
+app.MapHealthChecks("/Health", new HealthCheckOptions
+{
+    AllowCachingResponses = false, // Desabilita o cache para garantir que as verificações de saúde sejam sempre atualizadas
+    ResultStatusCodes = 
+    {
+        [HealthStatus.Healthy] = StatusCodes.Status200OK, // Retorna 200 OK se a aplicação estiver saudável
+        [HealthStatus.Unhealthy] = StatusCodes.Status503ServiceUnavailable, // Retorna 503 Service Unavailable se a aplicação estiver com problemas
+    }
+});
 
 if (app.Environment.IsDevelopment())
 {
